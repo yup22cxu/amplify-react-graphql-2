@@ -17,6 +17,9 @@
       },
       "api": {
         "amplifyreactgraphql2": {}
+      },
+      "storage": {
+        "amplifyapptut2": {}
       }
     }
   }
