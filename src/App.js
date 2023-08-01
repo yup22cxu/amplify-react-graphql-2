@@ -94,7 +94,7 @@ const App = ({ signOut }) => {
           </Button>
         </Flex>
       </View>
-      <Heading level={2}>Current Notes</Heading>
+      <Heading level={2}>Current Not</Heading>
       <View margin="3rem 0">
       {notes.map((note) => (
   <Flex
