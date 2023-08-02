@@ -47,6 +47,7 @@ const App = ({ signOut }) => {
       name: form.get("name"),
       description: form.get("description"),
       image: image.name,
+      tag: form.get("tag"),
     };
     if (!!data.image) await Storage.put(data.name, image);
     await API.graphql({
@@ -88,17 +89,27 @@ const App = ({ signOut }) => {
             labelHidden
             variation="quiet"
             required
+          />         
+          <TextField
+            name="tag"
+            placeholder="Note Tag"
+            label="Note Tag"
+            labelHidden
+            variation="quiet"
           />
+          <View
+            name="image"
+            as="input"
+            type="file"
+            style={{ alignSelf: "end" }}
+          />
+
+
           <Button type="submit" variation="primary">
             Create Note
           </Button>
         </Flex>
-        <View
-  name="image"
-  as="input"
-  type="file"
-  style={{ alignSelf: "end" }}
-/>
+
       </View>
 
       <Heading level={2}>Current Not</Heading>
@@ -114,6 +125,7 @@ const App = ({ signOut }) => {
       {note.name}
     </Text>
     <Text as="span">{note.description}</Text>
+    <Text as="span">{note.tag}</Text>
     {note.image && (
       <Image
         src={note.image}
