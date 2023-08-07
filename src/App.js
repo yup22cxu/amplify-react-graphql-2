@@ -17,11 +17,48 @@ import {
   View,
   withAuthenticator,
 } from '@aws-amplify/ui-react';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { useCallback, useRef } from 'react';
+import { useMemo } from "react";
+
+
+
 const App = ({ signOut }) => {
   const [notes, setNotes] = useState([]);
 
+  const gridRef = useRef();
+
+  const pushMeClicked = useCallback ( e => {
+    gridRef.current.api.deselectAll();
+  });
+  const [rowData, setRowData] = useState([   
+  {make: 'Ford', model: 'Focus', price: 40000},
+  {make: 'Toyota', model: 'Celica', price: 45000},
+  {make: 'BMW', model: '4 Series', price: 50000}]);
+
+  const [columnDefs, setColumnDefs] = useState([
+    {field: 'make'},
+    {field: 'model'},
+    {field: 'price'}
+
+  ]);
+
+  const defaultColDef = useMemo( ()=> ({
+    sortable: true,
+    filter: true
+    }), []);
+
+  const cellClickedListener = useCallback(e => {
+    console.log('cellClicked', e);
+  });
+
   useEffect(() => {
     fetchNotes();
+    fetch('https://www.ag-grid.com/example-assets/row-data.json')
+    .then(result => result.json())
+    .then(rowData => setRowData(rowData))
   }, []);
 
   async function fetchNotes() {
@@ -112,7 +149,7 @@ const App = ({ signOut }) => {
 
       </View>
 
-      <Heading level={2}>Current Not</Heading>
+      <Heading level={2}>Notes</Heading>
       <View margin="3rem 0">
       {notes.map((note) => (
   <Flex
@@ -121,7 +158,17 @@ const App = ({ signOut }) => {
     justifyContent="center"
     alignItems="center"
   >
-    <Text as="strong" fontWeight={700}>
+  <table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Tag</th>
+    </tr>
+    </thead>
+    <tbody>
+      <tr>
+      <Text as="strong" fontWeight={700}>
       {note.name}
     </Text>
     <Text as="span">{note.description}</Text>
@@ -130,12 +177,27 @@ const App = ({ signOut }) => {
       <Image
         src={note.image}
         alt={`visual aid for ${notes.name}`}
-        style={{ width: 400 }}
+        style={{ width: 20 }}
       />
     )}
+      </tr>
+    </tbody>
+
+    <div className="ag-theme-alpine" style={{height: 500}}>
+      <button onClick={pushMeClicked}>Push Me</button>
+      <AgGridReact
+      ref = {gridRef}
+        onCellClicked={cellClickedListener}
+        rowData = {rowData}
+        columnDefs = {columnDefs}
+        defaultColDef = {defaultColDef}
+        rowSelection='multiple'
+        animateRows={true}/>
+    </div>
     <Button variation="link" onClick={() => deleteNote(note)}>
       Delete note
     </Button>
+    </table>
   </Flex>
 ))}
       </View>
