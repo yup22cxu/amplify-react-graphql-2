@@ -52,3 +52,60 @@ export const deleteNote = /* GraphQL */ `
     }
   }
 `;
+export const createListing = /* GraphQL */ `
+  mutation CreateListing(
+    $input: CreateListingInput!
+    $condition: ModelListingConditionInput
+  ) {
+    createListing(input: $input, condition: $condition) {
+      listingID
+      accountID
+      foodType
+      imageAddress
+      description
+      extraInfo
+      id
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const updateListing = /* GraphQL */ `
+  mutation UpdateListing(
+    $input: UpdateListingInput!
+    $condition: ModelListingConditionInput
+  ) {
+    updateListing(input: $input, condition: $condition) {
+      listingID
+      accountID
+      foodType
+      imageAddress
+      description
+      extraInfo
+      id
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const deleteListing = /* GraphQL */ `
+  mutation DeleteListing(
+    $input: DeleteListingInput!
+    $condition: ModelListingConditionInput
+  ) {
+    deleteListing(input: $input, condition: $condition) {
+      listingID
+      accountID
+      foodType
+      imageAddress
+      description
+      extraInfo
+      id
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;

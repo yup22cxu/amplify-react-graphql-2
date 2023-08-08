@@ -37,3 +37,43 @@ export const listNotes = /* GraphQL */ `
     }
   }
 `;
+export const getListing = /* GraphQL */ `
+  query GetListing($id: ID!) {
+    getListing(id: $id) {
+      listingID
+      accountID
+      foodType
+      imageAddress
+      description
+      extraInfo
+      id
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const listListings = /* GraphQL */ `
+  query ListListings(
+    $filter: ModelListingFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listListings(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        listingID
+        accountID
+        foodType
+        imageAddress
+        description
+        extraInfo
+        id
+        createdAt
+        updatedAt
+        __typename
+      }
+      nextToken
+      __typename
+    }
+  }
+`;

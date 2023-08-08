@@ -2,10 +2,16 @@ import React, { useState, useEffect } from "react";
 import "./App.css";
 import "@aws-amplify/ui-react/styles.css";
 import { listNotes } from "./graphql/queries";
+import { listListings } from "./graphql/queries";
 import {
   createNote as createNoteMutation,
   deleteNote as deleteNoteMutation,
 } from "./graphql/mutations";
+import {
+  createListing as createListingMutation,
+  deleteListing as deleteListingMutation,
+} from "./graphql/mutations"; 
+
 import { API, Storage } from 'aws-amplify';
 import {
   Button,
@@ -27,7 +33,7 @@ import { useMemo } from "react";
 
 const App = ({ signOut }) => {
   const [notes, setNotes] = useState([]);
-
+  const [listings, setListings] = useState([]);
   const gridRef = useRef();
 
   const pushMeClicked = useCallback ( e => {
@@ -75,6 +81,20 @@ const App = ({ signOut }) => {
     );
     setNotes(notesFromAPI);
   }
+  async function fetchListings() {
+    const apiData = await API.graphql({ query: listListings });
+    const listingsFromAPI = apiData.data.listListings.items;
+    await Promise.all(
+      listingsFromAPI.map(async (listing) => {
+        if (listing.image) {
+          const url = await Storage.get(listing.name);
+          listing.image = url;
+        }
+        return listing;
+      })
+    );
+    setListings(listingsFromAPI);
+  }
 
   async function createNote(event) {
     event.preventDefault();
@@ -94,7 +114,25 @@ const App = ({ signOut }) => {
     fetchNotes();
     event.target.reset();
   }
-  
+  async function createListing(event) {
+    event.preventDefault();
+    const form = new FormData(event.target);
+    const image = form.get("image");
+    const data = {
+      accountID : form.get("accountID"),
+      foodType: form.get("foodType"),
+      description: form.get("description"),
+      image: image.name,
+      extraInfo: form.get("extraInfo"),
+    };
+    if (!!data.image) await Storage.put(data.name, image);
+    await API.graphql({
+      query: createListingMutation,
+      variables: { input: data },
+    });
+    fetchNotes();
+    event.target.reset();
+  }
 
   async function deleteNote({ id, name }) {
     const newNotes = notes.filter((note) => note.id !== id);
@@ -105,6 +143,17 @@ const App = ({ signOut }) => {
       variables: { input: { id } },
     });
   }
+
+  async function deleteListing({ id, name }) {
+    const newListings = listings.filter((listing) => listing.id !== id);
+    setListings(newListings);
+    await Storage.remove(name);
+    await API.graphql({
+      query: deleteListingMutation,
+      variables: { input: { id } },
+    });
+  }
+
 
   return (
     <View className="App">
@@ -149,6 +198,54 @@ const App = ({ signOut }) => {
 
       </View>
 
+
+      <View as="form" margin="3rem 0" onSubmit={createListing}>
+        <Flex direction="row" justifyContent="center">
+          <TextField
+            name="AccountID"
+            placeholder="Listing AccountID"
+            label="Listing AccountID"
+            labelHidden
+            variation="quiet"
+            required
+          />
+          <TextField
+            name="FoodType"
+            placeholder="Listing FoodType"
+            label="Listing FoodType"
+            labelHidden
+            variation="quiet"
+            required
+          />
+          <TextField
+            name="description"
+            placeholder="Listing Description"
+            label="Listing Description"
+            labelHidden
+            variation="quiet"
+            required
+          />         
+          <TextField
+            name="ExtraInfo"
+            placeholder="Listing ExtraInfo"
+            label="Listing ExtraInfo"
+            labelHidden
+            variation="quiet"
+          />
+          <View
+            name="image"
+            as="input"
+            type="file"
+            style={{ alignSelf: "end" }}
+          />
+
+
+          <Button type="submit" variation="primary">
+            Create Listing
+          </Button>
+        </Flex>
+
+      </View>
       <Heading level={2}>Notes</Heading>
       <View margin="3rem 0">
       {notes.map((note) => (
@@ -158,16 +255,7 @@ const App = ({ signOut }) => {
     justifyContent="center"
     alignItems="center"
   >
-  <table>
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Tag</th>
-    </tr>
-    </thead>
-    <tbody>
-      <tr>
+
       <Text as="strong" fontWeight={700}>
       {note.name}
     </Text>
@@ -180,8 +268,6 @@ const App = ({ signOut }) => {
         style={{ width: 20 }}
       />
     )}
-      </tr>
-    </tbody>
 
     <div className="ag-theme-alpine" style={{height: 500}}>
       <button onClick={pushMeClicked}>Push Me</button>
@@ -197,7 +283,7 @@ const App = ({ signOut }) => {
     <Button variation="link" onClick={() => deleteNote(note)}>
       Delete note
     </Button>
-    </table>
+
   </Flex>
 ))}
       </View>

@@ -10,3 +10,12 @@ type Note @model @auth(rules: [{ allow: public }]) {
   tag: String
   image: String
 }
+
+type listing @model @auth(rules: [{ allow: public }]) {
+  listingID: ID!
+  accountID: String!
+  foodType: String
+  imageAddress: String
+  description: String
+  extraInfo: String
+}

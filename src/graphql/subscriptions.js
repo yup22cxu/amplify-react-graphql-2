@@ -43,3 +43,51 @@ export const onDeleteNote = /* GraphQL */ `
     }
   }
 `;
+export const onCreateListing = /* GraphQL */ `
+  subscription OnCreateListing($filter: ModelSubscriptionListingFilterInput) {
+    onCreateListing(filter: $filter) {
+      listingID
+      accountID
+      foodType
+      imageAddress
+      description
+      extraInfo
+      id
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateListing = /* GraphQL */ `
+  subscription OnUpdateListing($filter: ModelSubscriptionListingFilterInput) {
+    onUpdateListing(filter: $filter) {
+      listingID
+      accountID
+      foodType
+      imageAddress
+      description
+      extraInfo
+      id
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteListing = /* GraphQL */ `
+  subscription OnDeleteListing($filter: ModelSubscriptionListingFilterInput) {
+    onDeleteListing(filter: $filter) {
+      listingID
+      accountID
+      foodType
+      imageAddress
+      description
+      extraInfo
+      id
+      createdAt
+      updatedAt
+      __typename
+    }
+  }
+`;
